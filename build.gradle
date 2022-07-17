@@ -1,0 +1,96 @@
+description '微服务的父工程'
+// 构建 Gradle 脚本自身需要的资源，可以声明的资源包括依赖项、第三方插件、maven 仓库地址等。
+buildscript {
+    ext {
+        springBootVersion = '2.3.12.RELEASE'
+        springCloudVersion = 'Hoxton.SR12'
+        springCloudAlibabaVersion = '2.2.8.RELEASE'
+    }
+    //设置仓库
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        maven { url 'https://maven.aliyun.com/repository/spring-plugin' }
+    }
+    // 依赖
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+// 全局项目配置
+allprojects {
+    group 'com.github'
+    version '1.0'
+
+    // 设置编码信息
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+    tasks.withType(Javadoc) {
+        options.encoding = "UTF-8"
+    }
+    // 设置仓库
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        mavenCentral()
+    }
+}
+
+apply from: 'version.gradle'
+
+// 配置所有的子模块
+subprojects {
+    // 添加插件
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'io.spring.dependency-management'
+    // 设置 JDK
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    // 设置编码信息
+    compileJava.options.encoding = "UTF-8"
+    compileTestJava.options.encoding = "UTF-8"
+    // 公用的依赖
+    dependencies {
+        testImplementation(platform('org.junit:junit-bom:5.7.2'))
+        testImplementation('org.junit.jupiter:junit-jupiter')
+    }
+    test {
+        useJUnitPlatform()
+    }
+    // 相当于 Maven 的 <DependencyManagement> 标签
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+            mavenBom "com.alibaba.cloud:spring-cloud-alibaba-dependencies:${springCloudAlibabaVersion}"
+        }
+        dependencies {
+            for (depJar in rootProject.ext.dependencies) {
+                dependency(depJar)
+            }
+        }
+    }
+}
+
+// 配置 ones-uaa
+project(':ones-uaa') {
+    description '微服务的 uaa 模块'
+
+    apply plugin: 'org.springframework.boot'
+    // 依赖
+    dependencies {
+//        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'org.springframework.boot:spring-boot-starter-mail'
+        implementation 'org.springframework.boot:spring-boot-starter-security'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        compileOnly 'org.projectlombok:lombok'
+        developmentOnly 'org.springframework.boot:spring-boot-devtools'
+        runtimeOnly 'mysql:mysql-connector-java'
+        annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+        annotationProcessor 'org.projectlombok:lombok'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'org.springframework.security:spring-security-test'
+    }
+
+}

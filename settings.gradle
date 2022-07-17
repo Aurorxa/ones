@@ -1,0 +1,2 @@
+rootProject.name = 'ones'
+include ':ones-uaa'
