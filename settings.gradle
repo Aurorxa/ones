@@ -1,2 +1,6 @@
 rootProject.name = 'ones'
-include ':ones-uaa'
+include ':ones-common'
+include 'ones-service'
+include 'ones-service:service-uaa'
+findProject(':ones-service:service-uaa')?.name = 'service-uaa'
+

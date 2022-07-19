@@ -1,4 +1,4 @@
-package com.github;
+package com.github.ones;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,10 +9,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @since 2022-07-14 14:35:03
  */
 @SpringBootApplication
-public class OnesUaaApplication {
+public class Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(OnesUaaApplication.class, args);
+        SpringApplication.run(Application.class, args);
     }
 
 }

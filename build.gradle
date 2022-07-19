@@ -14,6 +14,7 @@ buildscript {
     // 依赖
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath "io.freefair.gradle:lombok-plugin:6.5.0.3"
     }
 }
 
@@ -44,6 +45,7 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'java-library'
     apply plugin: 'io.spring.dependency-management'
+    apply plugin: "io.freefair.lombok"
     // 设置 JDK
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -72,25 +74,50 @@ subprojects {
     }
 }
 
-// 配置 ones-uaa
-project(':ones-uaa') {
-    description '微服务的 uaa 模块'
-
-    apply plugin: 'org.springframework.boot'
+// 配置 ones-common
+project(':ones-common') {
+    description '公共模块'
     // 依赖
     dependencies {
-//        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-        implementation 'org.springframework.boot:spring-boot-starter-mail'
-        implementation 'org.springframework.boot:spring-boot-starter-security'
-        implementation 'org.springframework.boot:spring-boot-starter-validation'
-        implementation 'org.springframework.boot:spring-boot-starter-web'
-        compileOnly 'org.projectlombok:lombok'
-        developmentOnly 'org.springframework.boot:spring-boot-devtools'
-        runtimeOnly 'mysql:mysql-connector-java'
-        annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-        annotationProcessor 'org.projectlombok:lombok'
-        testImplementation 'org.springframework.boot:spring-boot-starter-test'
-        testImplementation 'org.springframework.security:spring-security-test'
+        api 'cn.hutool:hutool-all:5.8.4'
     }
-
 }
+
+
+// 配置 ones-service
+project(':ones-service') {
+    description '微服务模块'
+
+    subprojects {
+        apply plugin: 'org.springframework.boot'
+
+        dependencies {
+            api project(':ones-common')
+            /* mybatis-plus */
+            api 'com.baomidou:mybatis-plus-boot-starter'
+            /* 自动建表 */
+            api 'io.gitee.zero-wsh:acTable:2.0.6'
+            /* 邮件 */
+            api 'org.springframework.boot:spring-boot-starter-mail'
+            /* 安全 */
+            api 'org.springframework.boot:spring-boot-starter-security'
+            /* JSR 303 */
+            api 'org.springframework.boot:spring-boot-starter-validation'
+            /* web */
+            api 'org.springframework.boot:spring-boot-starter-web'
+            /* devtools */
+            developmentOnly 'org.springframework.boot:spring-boot-devtools'
+            /* MySQL 驱动 */
+            api 'mysql:mysql-connector-java'
+            /* 配置文件提示 */
+            api 'org.springframework.boot:spring-boot-configuration-processor'
+            /* 单元测试 */
+            testImplementation 'org.springframework.boot:spring-boot-starter-test'
+            /* mapstruct */
+//            api 'org.mapstruct.extensions.spring:mapstruct-spring-extensions:0.1.2'
+            /* 数据库连接池 */
+            api 'com.alibaba:druid-spring-boot-starter:1.2.5'
+        }
+    }
+}
+
